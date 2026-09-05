@@ -15,7 +15,7 @@
   </table>
   <div>
     <h1>mystic-framework/github-actions</h1>
-    <p>A consolidated group of composite GitHub Actions to streamline CI/CD workflows.
+    <p>A consolidated group of composite GitHub Actions to streamline CI/CD workflows.</p>
   </div>
 </div>
 
@@ -68,7 +68,7 @@ The module provides following actions:
 | Action | Description |
 | ------ | ----------- |
 | `pre-commit` | Runs pre-commit to ensure code passes basic expectations. |
-| `cpp-compatibility` | Builds the project (support for various OSes) and tests it againt the provided test files. |
+| `cpp-compatibility` | Builds the project (support for various OSes) and tests it against the provided test files. |
 | `cpp-lint` | Runs linting and static analysis on the codebase. It includes clang-format, clang-tidy, and cppcheck. |
 | `python-compatibility` | Runs the python project against the provided test files to ensure correct logic. |
 | `python-lint` | Runs lining and static analysis on the codebase. It includes ruff (both `format` and `check`), pylint, and mypy. |
