@@ -16,6 +16,5 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v7
 
-        # TODO: After it passes the check change it
       - name: Test Pre Commit Action
-        uses: thedevmystic/mystic-github-actions/pre-commit@main
+        uses: mystic-framework/github-actions/pre-commit@main
