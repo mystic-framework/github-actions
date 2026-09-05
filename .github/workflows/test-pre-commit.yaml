@@ -1,0 +1,20 @@
+name: "Test Pre Commit Action"
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  test-pre-commit-action:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+
+      - name: Test Pre Commit Action
+        uses: mystic-framework/github-actions/pre-commit@main
