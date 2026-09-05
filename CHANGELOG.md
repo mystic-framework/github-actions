@@ -6,4 +6,4 @@ All the notable changes in the project `mystic-framework/github-actions` will be
 
 ### Added
 
-- [None]
+- Pre-commit action
