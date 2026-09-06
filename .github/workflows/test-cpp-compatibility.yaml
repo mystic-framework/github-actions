@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  test-pre-commit-action:
+  test-cpp-compatibility-action:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
