@@ -17,6 +17,6 @@ jobs:
         uses: actions/checkout@v7
 
       - name: Test C++ Compatibility Action
-        uses: thedevmystic/mystic-github-actions/cpp-compatibility@main
+        uses: mystic-framework/github-actions/cpp-compatibility@main
         with:
           cmake-location: './test/dummy-cpp-project'
