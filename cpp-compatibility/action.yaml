@@ -1,0 +1,110 @@
+# -------------------------------------------------------------------------------------------------
+# Copyright 2026-present The Mystic Framework Authors
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# -------------------------------------------------------------------------------------------------
+# File: action.yaml
+# Desc: C++ compatibility composite action.
+# Auth: thedevmystic (Surya) <thedevmystic@gmail.com>
+#
+# SPDX-FileCopyrightText: 2026-present The Mystic Framework Authors
+# SPDX-License-Identifier: Apache-2.0
+# -------------------------------------------------------------------------------------------------
+
+name: "C++ Compatibility"
+description: "Builds the project and tests it against the provided test files."
+
+inputs:
+  use-cache:
+    description: "Enable or disable caching for the action."
+    type: boolean
+    required: false
+    default: "true"
+  compiler:
+    description: "Compiler to run the compatibility check."
+    type: string
+    required: false
+    default: "gcc"
+  install-command:
+    description: "Install command to run."
+    type: string
+    required: false
+    default: ""
+  build-type:
+    description: "Build type of the project"
+    type: string
+    required: false
+    default: "Release"
+  cmake-location:
+    description: "Where CMakeLists.txt is located."
+    type: string
+    required: false
+    default: "." # Defaults to find at root
+  additional-cmake-args:
+    description: "Additional CMake Arguments."
+    type: string
+    required: false
+    default: ""
+  run-tests:
+    description: "Whether to run tests or not."
+    type: boolean
+    required: false
+    default: "true"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Run install command
+      if: inputs.install-command != ''
+      shell: bash
+      run: ${{ inputs.install-command }}
+
+    - name: Setup Cache
+      id: cache
+      if: ${{ inputs.use-cache == 'true' }}
+      uses: actions/cache@v6
+      with:
+        path: |
+          ./build/
+          ~/.cache/ccache
+          ~/.ccache
+          ~/.config/ccache
+          ~/Library/Caches/ccache
+          ${{ env.LOCALAPPDATA }}/ccache
+          ${{ env.XDG_CACHE_HOME }}/ccache
+        key: cache-${{ runner.os }}-${{ inputs.compiler }}-${{ inputs.build-type }}-${{ hashFiles('${{ inputs.cmake-location }}/CMakeLists.txt') }}
+        restore-keys: cache-${{ runner.os }}-${{ inputs.build-type }}-
+
+    - name: Setup C++ Environment
+      uses: aminya/setup-cpp@v1
+      with:
+        compiler: ${{ inputs.compiler }}
+        cmake: true
+        ninja: true
+        ccache: ${{ inputs.use-cache }}
+
+
+    - name: Configure CMake
+      shell: bash
+      run: |
+        cmake -S ${{ inputs.cmake-location }} -B build -G "Ninja" \
+          -DCMAKE_BUILD_TYPE=${{ inputs.build-type }} \
+          ${{ inputs.additional-cmake-args }}
+
+    - name: Build
+      shell: bash
+      run: cmake --build build --config ${{ inputs.build-type }}
+
+    - name: Test
+      if: inputs.run-tests == 'true'
+      shell: bash
+      run: ctest --output-on-failure --test-dir build -C ${{ inputs.build-type }}

@@ -1,0 +1,22 @@
+name: "Test C++ Compatibility Action"
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  test-cpp-compatibility-action:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+
+      - name: Test C++ Compatibility Action
+        uses: mystic-framework/github-actions/cpp-compatibility@main
+        with:
+          cmake-location: './test/dummy-cpp-project'

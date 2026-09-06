@@ -1,0 +1,69 @@
+---
+BasedOnStyle: Google
+Language: Cpp
+Standard: Latest
+
+# --- Line length / whitespace ---
+ColumnLimit: 100
+IndentWidth: 2
+UseTab: Never
+MaxEmptyLinesToKeep: 1
+
+# --- Namespaces ---
+NamespaceIndentation: None
+FixNamespaceComments: true
+CompactNamespaces: true
+
+# --- Classes ---
+AccessModifierOffset: -1
+
+# --- Braces / control flow ---
+BreakBeforeBraces: Attach
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+AllowShortBlocksOnASingleLine: Never
+AllowShortFunctionsOnASingleLine: InlineOnly
+AllowShortLambdasOnASingleLine: All
+AllowShortEnumsOnASingleLine: false
+AllowShortCaseLabelsOnASingleLine: false
+IndentCaseLabels: true
+IndentCaseBlocks: false
+SpaceBeforeParens: ControlStatements
+SpaceAfterCStyleCast: false
+
+# --- Pointers / references ---
+PointerAlignment: Left
+ReferenceAlignment: Left
+DerivePointerAlignment: false
+SpacesInAngles: false
+
+# --- Braced init lists ---
+Cpp11BracedListStyle: true
+SpaceBeforeCpp11BracedList: false
+
+# --- Constructor initializer lists ---
+PackConstructorInitializers: NextLine
+BreakConstructorInitializers: BeforeColon
+ConstructorInitializerIndentWidth: 4
+ContinuationIndentWidth: 4
+
+# --- Function calls / declarations / brace init wrapping ---
+AlignAfterOpenBracket: BlockIndent
+BinPackArguments: false
+BinPackParameters: false
+AllowAllArgumentsOnNextLine: true
+AllowAllParametersOfDeclarationOnNextLine: true
+
+# --- Boolean expressions ---
+BreakBeforeBinaryOperators: None
+AlignOperands: DontAlign
+
+# --- Preprocessor ---
+IndentPPDirectives: AfterHash
+PPIndentWidth: 2
+
+# --- Misc ---
+ReflowComments: true
+SpacesBeforeTrailingComments: 2
+InsertNewlineAtEOF: true
+...
