@@ -26,24 +26,26 @@ description: "Runs pre-commit to conduct basic hygiene checks."
 inputs:
   use-cache:
     description: "Enable or disable caching for pre-commit hooks."
+    type: boolean
     required: false
     default: "true"
   args:
     description: "Arguments passed to pre-commit."
+    type: string
     required: false
     default: "--all-files"
 
 runs:
   using: "composite"
   steps:
-    - name: Set up Python
+    - name: Setup Python
       uses: actions/setup-python@v7
       with:
         python-version: "3.x"
         cache: ${{ inputs.use-cache == 'true' && 'pip' || '' }}
         cache-dependency-path: ".pre-commit-config.yaml"
 
-    - name: Set up pre-commit cache
+    - name: Setup pre-commit cache
       id: cache-pre-commit
       if: ${{ inputs.use-cache == 'true' }}
       uses: actions/cache@v6
