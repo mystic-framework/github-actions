@@ -38,7 +38,7 @@ inputs:
     description: "Install command to run."
     type: string
     required: false
-    default: "pip install .[dev]"
+    default: "pip install --group dev ."
   working-directory:
     description: "Where the Python project (requirements.txt / pyproject.toml) is located."
     type: string
