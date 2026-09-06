@@ -24,8 +24,11 @@ FetchContent_Declare(
 )
 
 FetchContent_MakeAvailable(Catch2)
-enable_testing()
+list(APPEND CMAKE_MODULE_PATH ${catch2_SOURCE_DIR}/extras)
 
+enable_testing()
 add_executable(tests source/dummy.cpp test/test.cpp)
 target_link_libraries(tests PRIVATE Catch2::Catch2WithMain)
-add_test(NAME DummyTests COMMAND tests)
+
+include(Catch)
+catch_discover_tests(tests)
