@@ -76,6 +76,7 @@ runs:
 
     - name: Run install command
       if: inputs.install-command != ''
+      working-directory: ${{ inputs.working-directory }}
       shell: bash
       run: ${{ inputs.install-command }}
 
@@ -86,15 +87,18 @@ runs:
 
     - name: Ruff Format Check
       if: ${{ inputs.lint == 'true' }}
+      working-directory: ${{ inputs.working-directory }}
       shell: bash
-      run: ruff format --check ${{ inputs.working-directory }}
+      run: ruff format --check .
 
     - name: Ruff Lint
       if: ${{ inputs.lint == 'true' }}
+      working-directory: ${{ inputs.working-directory }}
       shell: bash
-      run: ruff check ${{ inputs.working-directory }}
+      run: ruff check .
 
     - name: Test
       if: inputs.run-tests == 'true'
+      working-directory: ${{ inputs.working-directory }}
       shell: bash
-      run: pytest ${{ inputs.working-directory }}
+      run: pytest .
