@@ -1,0 +1,22 @@
+name: "Test Python Compatibility Action"
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  test-python-compatibility-action:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+
+      - name: Test Python Compatibility Action
+        uses: thedevmystic/mystic-github-actions/python-compatibility@main
+        with:
+          working-directory: './test/dummy-python-project'
