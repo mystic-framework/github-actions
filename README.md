@@ -14,7 +14,7 @@
     </tr>
   </table>
   <div>
-    <h1>mystic-framework/github-actions</h1>
+    <h1>Github Actions</h1>
     <p>A consolidated group of composite GitHub Actions to streamline CI/CD workflows.</p>
   </div>
 </div>
