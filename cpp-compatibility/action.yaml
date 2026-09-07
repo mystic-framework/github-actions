@@ -94,7 +94,7 @@ runs:
 
 
     - name: Configure CMake
-      working-directory: ${{ inputs.working-directory }} 
+      working-directory: ${{ inputs.working-directory }}
       shell: bash
       run: |
         cmake -S . -B build -G "Ninja" \
@@ -102,12 +102,12 @@ runs:
           ${{ inputs.additional-cmake-args }}
 
     - name: Build
-      working-directory: ${{ inputs.working-directory }} 
+      working-directory: ${{ inputs.working-directory }}
       shell: bash
       run: cmake --build build --config ${{ inputs.build-type }}
 
     - name: Test
       if: inputs.run-tests == 'true'
-      working-directory: ${{ inputs.working-directory }} 
+      working-directory: ${{ inputs.working-directory }}
       shell: bash
       run: ctest --output-on-failure --test-dir build -C ${{ inputs.build-type }}
