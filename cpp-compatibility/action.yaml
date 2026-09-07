@@ -44,8 +44,8 @@ inputs:
     type: string
     required: false
     default: "Release"
-  cmake-location:
-    description: "Where CMakeLists.txt is located."
+  working-directory:
+    description: "Current working directory (i.e., where CMakeLists.txt is located)."
     type: string
     required: false
     default: "." # Defaults to find at root
@@ -81,7 +81,7 @@ runs:
           ~/Library/Caches/ccache
           ${{ env.LOCALAPPDATA }}/ccache
           ${{ env.XDG_CACHE_HOME }}/ccache
-        key: cache-${{ runner.os }}-${{ inputs.compiler }}-${{ inputs.build-type }}-${{ hashFiles('${{ inputs.cmake-location }}/CMakeLists.txt') }}
+        key: cache-${{ runner.os }}-${{ inputs.compiler }}-${{ inputs.build-type }}-${{ hashFiles('${{ inputs.working-directory }}/CMakeLists.txt') }}
         restore-keys: cache-${{ runner.os }}-${{ inputs.build-type }}-
 
     - name: Setup C++ Environment
@@ -94,17 +94,20 @@ runs:
 
 
     - name: Configure CMake
+      working-directory: ${{ inputs.working-directory }}
       shell: bash
       run: |
-        cmake -S ${{ inputs.cmake-location }} -B build -G "Ninja" \
+        cmake -S . -B build -G "Ninja" \
           -DCMAKE_BUILD_TYPE=${{ inputs.build-type }} \
           ${{ inputs.additional-cmake-args }}
 
     - name: Build
+      working-directory: ${{ inputs.working-directory }}
       shell: bash
       run: cmake --build build --config ${{ inputs.build-type }}
 
     - name: Test
       if: inputs.run-tests == 'true'
+      working-directory: ${{ inputs.working-directory }}
       shell: bash
       run: ctest --output-on-failure --test-dir build -C ${{ inputs.build-type }}
