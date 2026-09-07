@@ -1,0 +1,24 @@
+name: "Test SonarQube Action - C++"
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  test-sonarqube-action-cpp:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+
+      - name: Test SonarQube Action - C++
+        uses: mystic-framework/github-actions/sonarqube@main
+        with:
+          language: 'cpp'
+          sonar-token: ${{ secrets.SONAR_TOKEN }}
+          working-directory: './test/dummy-cpp-project'

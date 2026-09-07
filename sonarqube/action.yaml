@@ -38,7 +38,7 @@ inputs:
     required: false
     default: "true"
   working-directory:
-    description: "Current working directory (i.e., where CMakeLists.txt is located)."
+    description: "Current working directory (i.e., where CMakeLists.txt / pyproject.toml is located)."
     type: string
     required: false
     default: "." # Defaults to find at root
@@ -153,37 +153,44 @@ runs:
 
     - name: Configure C++ Project
       if: inputs.language == 'cpp'
+      working-directory: ${{ inputs.working-directory }}
       shell: bash
       run: |
         cmake -S . -B build -D${{ inputs.cpp-coverage-option }}=ON -DCMAKE_BUILD_TYPE=Release ${{ inputs.additional-cmake-args }}
 
     - name: Configure Python Project
       if: inputs.language == 'python'
+      working-directory: ${{ inputs.working-directory }}
       shell: bash
       run: pip install .
 
     - name: Run Build Wrapper
       if: inputs.language == 'cpp'
+      working-directory: ${{ inputs.working-directory }}
       shell: bash
       run: build-wrapper-linux-x86-64 --out-dir "$BUILD_WRAPPER_OUT_DIR" cmake --build build/ --config Release
 
     - name: Run C++ Tests
       if: inputs.language == 'cpp'
+      working-directory: ${{ inputs.working-directory }}
       shell: bash
       run: ctest --output-on-failure --test-dir build
 
     - name: Run Python Tests with Coverage Report
       if: inputs.language == 'python'
+      working-directory: ${{ inputs.working-directory }}
       shell: bash
       run: pytest --cov=${{ inputs.python-package-name }} --cov-report=xml:coverage.xml --cov-report=term ${{ inputs.python-coverage-tool-args }}
 
     - name: Generate Coverage Report (GCC)
       if: ${{ inputs.language == 'cpp' && inputs.cpp-coverage-tool == 'gcov' }}
+      working-directory: ${{ inputs.working-directory }}
       shell: bash
       run: gcovr --sonarqube coverage.xml ${{ inputs.cpp-coverage-tool-args }}
 
     - name: Generate Coverage Report (LLVM)
       if: ${{ inputs.language == 'cpp' && inputs.cpp-coverage-tool == 'llvm-cov' }}
+      working-directory: ${{ inputs.working-directory }}
       shell: bash
       run: |
         llvm-profdata merge -sparse build/*.profraw -o coverage.profdata
@@ -196,6 +203,7 @@ runs:
 
     - name: SonarQube Scan (GCC)
       if: ${{ inputs.language == 'cpp' && inputs.cpp-coverage-tool == 'gcov' }}
+      working-directory: ${{ inputs.working-directory }}
       env:
         SONAR_TOKEN: ${{ inputs.sonar-token }}
       uses: SonarSource/sonarqube-scan-action@v8
@@ -207,6 +215,7 @@ runs:
 
     - name: SonarQube Scan (LLVM)
       if: ${{ inputs.language == 'cpp' && inputs.cpp-coverage-tool == 'llvm-cov' }}
+      working-directory: ${{ inputs.working-directory }}
       env:
         SONAR_TOKEN: ${{ inputs.sonar-token }}
       uses: SonarSource/sonarqube-scan-action@v8
@@ -218,6 +227,7 @@ runs:
 
     - name: SonarQube Scan (Python)
       if: ${{ inputs.language == 'python' }}
+      working-directory: ${{ inputs.working-directory }}
       env:
         SONAR_TOKEN: ${{ inputs.sonar-token }}
       uses: SonarSource/sonarqube-scan-action@v8
