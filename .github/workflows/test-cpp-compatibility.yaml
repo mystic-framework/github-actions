@@ -19,4 +19,4 @@ jobs:
       - name: Test C++ Compatibility Action
         uses: mystic-framework/github-actions/cpp-compatibility@main
         with:
-          cmake-location: './test/dummy-cpp-project'
+          working-directory: './test/dummy-cpp-project'
