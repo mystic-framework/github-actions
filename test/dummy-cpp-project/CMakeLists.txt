@@ -9,6 +9,19 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+# Coverage Option
+option(MYSTIC_ENABLE_COVERAGE "Enable code coverage instrumentation" OFF)
+
+if(MYSTIC_ENABLE_COVERAGE)
+  if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    add_compile_options(-fprofile-instr-generate -fcoverage-mapping)
+    add_link_options(-fprofile-instr-generate -fcoverage-mapping)
+  elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+    add_compile_options(--coverage)
+    add_link_options(--coverage)
+  endif()
+endif()
+
 # Include directories
 include_directories("${CMAKE_SOURCE_DIR}/source")
 

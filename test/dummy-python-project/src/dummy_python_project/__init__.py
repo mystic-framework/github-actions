@@ -1,3 +1,3 @@
-from dummy_python_project.main import add, returnFourtyTwo, returnTrue
+from dummy_python_project.main import add, return_forty_two, return_true
 
-__all__ = ["add", "returnFourtyTwo", "returnTrue"]
+__all__ = ["add", "return_forty_two", "return_true"]

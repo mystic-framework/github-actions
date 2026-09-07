@@ -6,11 +6,11 @@ def add(a, b) -> int:
     return a + b
 
 
-def returnFourtyTwo() -> int:
+def return_forty_two() -> int:
     """Return the number 42."""
     return 42
 
 
-def returnTrue() -> bool:
+def return_true() -> bool:
     """Return True."""
     return True

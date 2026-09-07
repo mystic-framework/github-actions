@@ -1,0 +1,27 @@
+name: "Test SonarQube Action - Python"
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  test-sonarqube-action-python:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Test SonarQube Action - Python
+        uses: mystic-framework/github-actions/sonarqube@main
+        with:
+          language: 'python'
+          sonar-token: ${{ secrets.SONAR_TOKEN }}
+          working-directory: './test/dummy-python-project'
+          python-package-name: 'dummy_python_project'

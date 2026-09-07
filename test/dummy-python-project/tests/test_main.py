@@ -1,4 +1,4 @@
-from dummy_python_project.main import add, returnFourtyTwo, returnTrue
+from dummy_python_project.main import add, return_forty_two, return_true
 
 
 def test_add():
@@ -7,9 +7,9 @@ def test_add():
     assert add(0, 0) == 0
 
 
-def test_returnFourtyTwo():
-    assert returnFourtyTwo() == 42
+def test_return_forty_two():
+    assert return_forty_two() == 42
 
 
-def test_returnTrue():
-    assert returnTrue() is True
+def test_return_true():
+    assert return_true() is True

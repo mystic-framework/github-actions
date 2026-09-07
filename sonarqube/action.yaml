@@ -1,0 +1,238 @@
+# -------------------------------------------------------------------------------------------------
+# Copyright 2026-present The Mystic Framework Authors
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# -------------------------------------------------------------------------------------------------
+# File: action.yaml
+# Desc: SonarQube coverage composite action.
+# Auth: thedevmystic (Surya) <thedevmystic@gmail.com>
+#
+# SPDX-FileCopyrightText: 2026-present The Mystic Framework Authors
+# SPDX-License-Identifier: Apache-2.0
+# -------------------------------------------------------------------------------------------------
+
+name: "SonarQube Coverage"
+description: "Generates test coverage files and uploads it to SonarQubeCloud."
+
+inputs:
+  language:
+    description: "The language of the project. Valid options: cpp or python"
+    type: string
+    required: true
+  sonar-token:
+    description: "SonarQube Cloud token."
+    type: string
+    required: true
+  use-cache:
+    description: "Enable or disable caching for the action."
+    type: boolean
+    required: false
+    default: "true"
+  working-directory:
+    description: "Current working directory (i.e., where CMakeLists.txt / pyproject.toml is located)."
+    type: string
+    required: false
+    default: "." # Defaults to find at root
+  additional-cmake-args:
+    description: "Additional CMake Arguments."
+    type: string
+    required: false
+    default: ""
+
+  cpp-coverage-tool:
+    description: "Coverage tool use for C++. Valid options: gcov or llvm-cov"
+    type: string
+    required: false
+    default: "llvm-cov"
+  cpp-coverage-tool-args:
+    description: "Any additional arguments passed to gcov or llvm-cov"
+    type: string
+    required: false
+    default: ""
+  cpp-coverage-option:
+    description: "CMake option that enables coverage building for your project."
+    type: string
+    required: false
+    default: "MYSTIC_ENABLE_COVERAGE"
+
+  python-coverage-tool-args:
+    description: "Any additional arguments passed to python coverage tool."
+    type: string
+    required: false
+    default: ""
+
+runs:
+  using: composite
+  steps:
+    - name: Setup C++ Cache
+      id: cache-cpp
+      if: ${{ inputs.use-cache == 'true' && inputs.language =='cpp' }}
+      uses: actions/cache@v6
+      with:
+        path: |
+          ./build/
+          ~/.cache/ccache
+          ~/.ccache
+          ~/.config/ccache
+          ~/Library/Caches/ccache
+          ${{ env.LOCALAPPDATA }}/ccache
+          ${{ env.XDG_CACHE_HOME }}/ccache
+        key: cache-${{ runner.os }}-${{ inputs.language }}-${{ inputs.cpp-coverage-tool }}-${{ hashFiles('${{ inputs.working-directory }}/CMakeLists.txt') }}
+        restore-keys: cache-${{ runner.os }}-${{ inputs.language }}-
+
+    - name: Setup Python Cache
+      id: cache-python
+      if: ${{ inputs.use-cache == 'true' && inputs.language =='python' }}
+      uses: actions/cache@v6
+      with:
+        path: |
+          ~/.cache/pip
+          ${{ inputs.working-directory }}/.venv
+        key: cache-${{ runner.os }}-${{ inputs.language }}-${{ hashFiles(format('{0}/requirements.txt', inputs.working-directory), format('{0}/pyproject.toml', inputs.working-directory), format('{0}/poetry.lock', inputs.working-directory)) }}
+        restore-keys: cache-${{ runner.os }}-${{ inputs.language }}-
+
+    - name: Setup C++ Environment
+      if: inputs.language == 'cpp'
+      uses: aminya/setup-cpp@v1
+      with:
+        compiler: ${{ inputs.cpp-coverage-tool == 'llvm-cov' && 'llvm' || 'gcc' }}
+        cmake: true
+        ninja: true
+
+    - name: Setup Python Environment
+      if: inputs.language == 'python'
+      uses: actions/setup-python@v7
+      with:
+        python-version: '3.x'
+
+    - name: Install SonarQube Build Wrapper
+      if: inputs.language == 'cpp'
+      uses: SonarSource/sonarqube-scan-action/install-build-wrapper@v8
+
+    - name: Setup SonarQube Build Wrapper Variables
+      if: inputs.language == 'cpp'
+      shell: bash
+      run: echo "BUILD_WRAPPER_OUT_DIR=build_wrapper_output_directory" >> $GITHUB_ENV
+
+    - name: Setup Sonar Scanner CLI
+      shell: bash
+      run: |
+        SONAR_SCANNER_VERSION="6.1.0.4477"
+        curl -sSLo sonar-scanner.zip "https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${SONAR_SCANNER_VERSION}-linux-x64.zip"
+        unzip -q sonar-scanner.zip -d /tmp
+        echo "/tmp/sonar-scanner-${SONAR_SCANNER_VERSION}-linux-x64/bin" >> $GITHUB_PATH
+        rm sonar-scanner.zip
+
+    - name: Install C++ Coverage Tools
+      if: inputs.language == 'cpp'
+      shell: bash
+      run: |
+        TOOL="${{ inputs.cpp-coverage-tool }}"
+        if [ "$TOOL" = "llvm-cov" ]; then
+          ARGS="clang llvm"
+        else
+          ARGS="gcovr"
+        fi
+        sudo apt-get update && sudo apt-get install -y $ARGS
+
+    - name: Install Python Coverage Tools
+      if: inputs.language == 'python'
+      shell: bash
+      run: |
+        pip install pytest pytest-cov
+
+    - name: Setup C++ Coverage Tools Variables
+      if: ${{ inputs.language == 'cpp' && inputs.cpp-coverage-tool == 'llvm-cov' }}
+      shell: bash
+      run: echo "LLVM_PROFILE_FILE=%p.profraw" >> $GITHUB_ENV
+
+    - name: Configure C++ Project
+      if: inputs.language == 'cpp'
+      working-directory: ${{ inputs.working-directory }}
+      shell: bash
+      run: |
+        cmake -S . -B build -G Ninja -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -D${{ inputs.cpp-coverage-option }}=ON -DCMAKE_BUILD_TYPE=Release ${{ inputs.additional-cmake-args }}
+
+    - name: Configure Python Project
+      if: inputs.language == 'python'
+      working-directory: ${{ inputs.working-directory }}
+      shell: bash
+      run: pip install -e .
+
+    - name: Run Build Wrapper
+      if: inputs.language == 'cpp'
+      working-directory: ${{ inputs.working-directory }}
+      shell: bash
+      run: build-wrapper-linux-x86-64 --out-dir "$BUILD_WRAPPER_OUT_DIR" cmake --build build/ --config Release
+
+    - name: Run C++ Tests
+      if: inputs.language == 'cpp'
+      working-directory: ${{ inputs.working-directory }}
+      shell: bash
+      run: ctest --output-on-failure --test-dir build
+
+    - name: Run Python Tests with Coverage Report
+      if: inputs.language == 'python'
+      working-directory: ${{ inputs.working-directory }}
+      shell: bash
+      run: pytest --cov=src --cov-report=xml:coverage.xml --cov-report=term ${{ inputs.python-coverage-tool-args }}
+
+    - name: Generate Coverage Report (GCC)
+      if: ${{ inputs.language == 'cpp' && inputs.cpp-coverage-tool == 'gcov' }}
+      working-directory: ${{ inputs.working-directory }}
+      shell: bash
+      run: gcovr --sonarqube coverage.xml ${{ inputs.cpp-coverage-tool-args }}
+
+    - name: Generate Coverage Report (LLVM)
+      if: ${{ inputs.language == 'cpp' && inputs.cpp-coverage-tool == 'llvm-cov' }}
+      working-directory: ${{ inputs.working-directory }}
+      shell: bash
+      run: |
+        llvm-profdata merge -sparse build/*.profraw -o coverage.profdata
+        llvm-cov show \
+          --instr-profile=coverage.profdata \
+          --show-branches=count \
+          --ignore-filename-regex='(build/|third_party/|vendor/)' \
+          $(find build -maxdepth 1 -type f -executable -name "*test*") \
+          > coverage.report
+
+    - name: SonarQube Scan (GCC)
+      if: ${{ inputs.language == 'cpp' && inputs.cpp-coverage-tool == 'gcov' }}
+      working-directory: ${{ inputs.working-directory }}
+      env:
+        SONAR_TOKEN: ${{ inputs.sonar-token }}
+      shell: bash
+      run: |
+        sonar-scanner \
+          -Dsonar.cfamily.compile-commands="${{ env.BUILD_WRAPPER_OUT_DIR }}/compile_commands.json" \
+          -Dsonar.cfamily.gcov.reportsPath="coverage.xml"
+
+    - name: SonarQube Scan (LLVM)
+      if: ${{ inputs.language == 'cpp' && inputs.cpp-coverage-tool == 'llvm-cov' }}
+      working-directory: ${{ inputs.working-directory }}
+      env:
+        SONAR_TOKEN: ${{ inputs.sonar-token }}
+      shell: bash
+      run: |
+        sonar-scanner \
+          -Dsonar.cfamily.compile-commands="${{ env.BUILD_WRAPPER_OUT_DIR }}/compile_commands.json" \
+          -Dsonar.cfamily.llvm-cov.reportPath="coverage.report"
+
+    - name: SonarQube Scan (Python)
+      if: inputs.language == 'python'
+      working-directory: ${{ inputs.working-directory }}
+      env:
+        SONAR_TOKEN: ${{ inputs.sonar-token }}
+      shell: bash
+      run: |
+        sonar-scanner \
+          -Dsonar.python.coverage.reportPaths="coverage.xml"
