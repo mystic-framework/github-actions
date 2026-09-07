@@ -1,0 +1,104 @@
+# -------------------------------------------------------------------------------------------------
+# Copyright 2026-present The Mystic Framework Authors
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# -------------------------------------------------------------------------------------------------
+# File: action.yaml
+# Desc: Python compatibility composite action.
+# Auth: thedevmystic (Surya) <thedevmystic@gmail.com>
+#
+# SPDX-FileCopyrightText: 2026-present The Mystic Framework Authors
+# SPDX-License-Identifier: Apache-2.0
+# -------------------------------------------------------------------------------------------------
+
+name: "Python Compatibility"
+description: "Runs the python project against the provided test files to ensure correct logic."
+
+inputs:
+  python-version:
+    description: "Python version to use for the compatibility check."
+    type: string
+    required: false
+    default: "3.x"
+  use-cache:
+    description: "Enable or disable caching for the action."
+    type: boolean
+    required: false
+    default: "true"
+  install-command:
+    description: "Install command to run."
+    type: string
+    required: false
+    default: "pip install --group dev ."
+  working-directory:
+    description: "Where the Python project (requirements.txt / pyproject.toml) is located."
+    type: string
+    required: false
+    default: "." # Defaults to find at root
+  lint:
+    description: "Whether to run ruff format check and lint or not."
+    type: boolean
+    required: false
+    default: "true"
+  run-tests:
+    description: "Whether to run tests or not."
+    type: boolean
+    required: false
+    default: "true"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup Cache
+      id: cache
+      if: ${{ inputs.use-cache == 'true' }}
+      uses: actions/cache@v6
+      with:
+        path: |
+          ~/.cache/pip
+          ${{ inputs.working-directory }}/.venv
+        key: cache-${{ runner.os }}-${{ inputs.python-version }}-${{ hashFiles(format('{0}/requirements.txt', inputs.working-directory), format('{0}/pyproject.toml', inputs.working-directory), format('{0}/poetry.lock', inputs.working-directory)) }}
+        restore-keys: cache-${{ runner.os }}-${{ inputs.python-version }}-
+
+    - name: Setup Python Environment
+      uses: actions/setup-python@v7
+      with:
+        python-version: ${{ inputs.python-version }}
+
+    - name: Run install command
+      if: inputs.install-command != ''
+      working-directory: ${{ inputs.working-directory }}
+      shell: bash
+      run: ${{ inputs.install-command }}
+
+    - name: Install Ruff
+      if: ${{ inputs.lint == 'true' }}
+      shell: bash
+      run: pip install ruff
+
+    - name: Ruff Format Check
+      if: ${{ inputs.lint == 'true' }}
+      working-directory: ${{ inputs.working-directory }}
+      shell: bash
+      run: ruff format --check .
+
+    - name: Ruff Lint
+      if: ${{ inputs.lint == 'true' }}
+      working-directory: ${{ inputs.working-directory }}
+      shell: bash
+      run: ruff check .
+
+    - name: Test
+      if: inputs.run-tests == 'true'
+      working-directory: ${{ inputs.working-directory }}
+      shell: bash
+      run: pytest .

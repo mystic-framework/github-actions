@@ -1,0 +1,22 @@
+[project]
+name = "dummy-python-project"
+version = "1.0.0"
+description = "Dummy Python project for testing purposes."
+readme = "README.md"
+authors = [
+    { name = "Surya!", email = "thedevmystic@gmail.com" }
+]
+requires-python = ">=3.13"
+dependencies = []
+
+[project.scripts]
+dummy-python-project = "dummy_python_project:main"
+
+[build-system]
+requires = ["uv_build>=0.12.9,<0.13.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+]

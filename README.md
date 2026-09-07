@@ -69,9 +69,7 @@ The module provides following actions:
 | ------ | ----------- |
 | `pre-commit` | Runs pre-commit to ensure code passes basic expectations. |
 | `cpp-compatibility` | Builds the project (support for various OSes) and tests it against the provided test files. |
-| `cpp-lint` | Runs linting and static analysis on the codebase. It includes clang-format, clang-tidy, and cppcheck. |
 | `python-compatibility` | Runs the python project against the provided test files to ensure correct logic. |
-| `python-lint` | Runs lining and static analysis on the codebase. It includes ruff (both `format` and `check`), pylint, and mypy. |
 | `sonarqube` | Generates test coverage files and uploads it to SonarQubeCloud. |
 
 ## Actions - Pre Commit
