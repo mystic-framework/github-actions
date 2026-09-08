@@ -79,14 +79,14 @@ runs:
       uses: actions/cache@v6
       with:
         path: |
-          ./build/
+          ${{ inputs.working-directory }}/build/
           ~/.cache/ccache
           ~/.ccache
           ~/.config/ccache
           ~/Library/Caches/ccache
           ${{ env.LOCALAPPDATA }}/ccache
           ${{ env.XDG_CACHE_HOME }}/ccache
-        key: cache-${{ runner.os }}-${{ inputs.language }}-${{ inputs.cpp-coverage-tool }}-${{ hashFiles('${{ inputs.working-directory }}/CMakeLists.txt') }}
+        key: cache-${{ runner.os }}-${{ inputs.language }}-${{ inputs.cpp-coverage-tool }}-${{ hashFiles(format('{0}/CMakeLists.txt', inputs.working-directory)) }}
         restore-keys: cache-${{ runner.os }}-${{ inputs.language }}-
 
     - name: Setup Python Cache
@@ -107,6 +107,7 @@ runs:
         compiler: ${{ inputs.cpp-coverage-tool == 'llvm-cov' && 'llvm' || 'gcc' }}
         cmake: true
         ninja: true
+        ccache: ${{ inputs.use-cache }}
 
     - name: Setup Python Environment
       if: inputs.language == 'python'
@@ -160,7 +161,19 @@ runs:
       working-directory: ${{ inputs.working-directory }}
       shell: bash
       run: |
-        cmake -S . -B build -G Ninja -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -D${{ inputs.cpp-coverage-option }}=ON -DCMAKE_BUILD_TYPE=Release ${{ inputs.additional-cmake-args }}
+        CACHE="${{ inputs.use-cache }}"
+        if [ "$CACHE" = "true" ]; then
+          CCACHE="-DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache"
+        else
+          CCACHE=""
+        fi
+
+        cmake -S . -B build -G Ninja \
+          $CCACHE \
+          -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+          -D${{ inputs.cpp-coverage-option }}=ON \
+          -DCMAKE_BUILD_TYPE=Release \
+          ${{ inputs.additional-cmake-args }}
 
     - name: Configure Python Project
       if: inputs.language == 'python'

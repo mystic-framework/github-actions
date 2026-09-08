@@ -81,7 +81,7 @@ runs:
           ~/Library/Caches/ccache
           ${{ env.LOCALAPPDATA }}/ccache
           ${{ env.XDG_CACHE_HOME }}/ccache
-        key: cache-${{ runner.os }}-${{ inputs.compiler }}-${{ inputs.build-type }}-${{ hashFiles('${{ inputs.working-directory }}/CMakeLists.txt') }}
+        key: cache-${{ runner.os }}-${{ inputs.compiler }}-${{ inputs.build-type }}-${{ hashFiles(format('{0}/CMakeLists.txt', inputs.working-directory)) }}
         restore-keys: cache-${{ runner.os }}-${{ inputs.build-type }}-
 
     - name: Setup C++ Environment
@@ -97,7 +97,15 @@ runs:
       working-directory: ${{ inputs.working-directory }}
       shell: bash
       run: |
+        CACHE="${{ inputs.use-cache }}"
+        if [ "$CACHE" = "true" ]; then
+          CCACHE="-DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache"
+        else
+          CACHE=""
+        fi
+
         cmake -S . -B build -G "Ninja" \
+          $CCACHE \
           -DCMAKE_BUILD_TYPE=${{ inputs.build-type }} \
           ${{ inputs.additional-cmake-args }}
 
