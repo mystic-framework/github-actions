@@ -86,7 +86,7 @@ The module provides following actions:
 
 This action configures python and pre-commit and runs it to ensure basic code hygiene.
 
-| Argument | Descripton |
+| Argument | Description |
 | -------- | ---------- |
 | `use-cache` | Whether to use cache or not. Defaults to `true`. |
 | `args` | Additional arguments passed to pre-commit. |
