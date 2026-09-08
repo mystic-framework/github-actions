@@ -101,7 +101,7 @@ runs:
         if [ "$CACHE" = "true" ]; then
           CCACHE="-DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache"
         else
-          CACHE=""
+          CCACHE=""
         fi
 
         cmake -S . -B build -G "Ninja" \

@@ -24,4 +24,3 @@ jobs:
           language: 'python'
           sonar-token: ${{ secrets.SONAR_TOKEN }}
           working-directory: './test/dummy-python-project'
-          python-package-name: 'dummy_python_project'
