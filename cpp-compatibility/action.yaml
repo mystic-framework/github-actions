@@ -74,7 +74,7 @@ runs:
       uses: actions/cache@v6
       with:
         path: |
-          ./build/
+          ${{ inputs.working-directory }}/build/
           ~/.cache/ccache
           ~/.ccache
           ~/.config/ccache
