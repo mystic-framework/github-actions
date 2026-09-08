@@ -29,15 +29,23 @@
     alt="License: Apache 2.0"
   />
   <img
-    src="https://img.shields.io/badge/Ver_0.0.1-007acc?style=flat"
-    alt="Version: 0.0.1 Under Development"
+    src="https://img.shields.io/badge/Ver_1.0.0-007acc?style=flat"
+    alt="Version: 1.0.0"
   />
 </p>
 
 <details>
 <summary>Table of Contents (click to show)</summary>
 
-Add ToC here.
+- [About](#about)
+- [Features](#features)
+- [Getting Started](#getting-started)
+  - [Actions - Pre Commit](#actions---pre-commit)
+  - [Actions - C++ Compatibility](#actions---c-compatibility)
+  - [Actions - Python Compatibility](#actions---python-compatibility)
+  - [Actions - SonarQube Coverage](#actions---sonarqube-coverage)
+- [Contributing](#contributing)
+- [License](#license)
 
 </details>
 
@@ -74,7 +82,221 @@ The module provides following actions:
 
 ## Actions - Pre Commit
 
-Add documentation here.
+[![Test Pre Commit Action](https://github.com/thedevmystic/mystic-github-actions/actions/workflows/test-pre-commit.yaml/badge.svg)](https://github.com/thedevmystic/mystic-github-actions/actions/workflows/test-pre-commit.yaml)
+
+This action configures python and pre-commit and runs it to ensure basic code hygiene.
+
+| Argument | Description |
+| -------- | ---------- |
+| `use-cache` | Whether to use cache or not. Defaults to `true`. |
+| `args` | Additional arguments passed to pre-commit. |
+
+**Example:**
+```yaml
+name: "Pre Commit"
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  pre-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+
+      - name: Pre Commit
+        uses: mystic-framework/github-actions/pre-commit@v1
+```
+
+## Actions - C++ Compatibility
+
+[![Test C++ Compatibility Action](https://github.com/thedevmystic/mystic-github-actions/actions/workflows/test-cpp-compatibility.yaml/badge.svg)](https://github.com/thedevmystic/mystic-github-actions/actions/workflows/test-cpp-compatibility.yaml)
+
+This action builds a CMake-based C++ project (via Ninja) and optionally runs its test suite with CTest. It supports cross-compiler
+configuration and caching of build artifacts and ccache data for faster re-runs.
+
+| Argument | Description |
+| -------- | ----------- |
+| `use-cache` | Whether to use cache or not. Defaults to `true`. |
+| `compiler` | Compiler to run the compatibility check. Defaults to `gcc`. |
+| `install-command` | Install command to run before setup (e.g., installing system dependencies). Defaults to `""`. |
+| `build-type` | Build type of the project. Defaults to `Release`. |
+| `working-directory` | Current working directory (i.e., where `CMakeLists.txt` is located). Defaults to `.`. |
+| `additional-cmake-args` | Additional CMake arguments. Defaults to `""`. |
+| `run-tests` | Whether to run tests or not. Defaults to `true`. |
+
+**Example:**
+```yaml
+name: "C++ Compatibility"
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  cpp-compatibility:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        compiler: [gcc, clang]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+
+      - name: C++ Compatibility
+        uses: mystic-framework/github-actions/cpp-compatibility@v1
+        with:
+          compiler: ${{ matrix.compiler }}
+          build-type: Release
+```
+
+## Actions - Python Compatibility
+
+[![Test Python Compatibility Action](https://github.com/thedevmystic/mystic-github-actions/actions/workflows/test-python-compatibility.yaml/badge.svg)](https://github.com/thedevmystic/mystic-github-actions/actions/workflows/test-python-compatibility.yaml)
+
+This action sets up a Python environment, optionally lints/format-checks the project with Ruff, and runs its test suite with
+pytest. Dependency and virtual environment caching is supported out of the box.
+
+| Argument | Description |
+| -------- | ----------- |
+| `python-version` | Python version to use for the compatibility check. Defaults to `3.x`. |
+| `use-cache` | Whether to use cache or not. Defaults to `true`. |
+| `install-command` | Install command to run. Defaults to `pip install --group dev .`. |
+| `working-directory` | Where the Python project (`requirements.txt` / `pyproject.toml`) is located. Defaults to `.`. |
+| `lint` | Whether to run Ruff format check and lint or not. Defaults to `true`. |
+| `run-tests` | Whether to run tests or not. Defaults to `true`. |
+
+**Example:**
+```yaml
+name: "Python Compatibility"
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  python-compatibility:
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12", "3.x"]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+
+      - name: Python Compatibility
+        uses: mystic-framework/github-actions/python-compatibility@v1
+        with:
+          python-version: ${{ matrix.python-version }}
+```
+
+## Actions - SonarQube Coverage
+
+[![Test SonarQube Action - C++](https://github.com/thedevmystic/mystic-github-actions/actions/workflows/cpp-coverage.yaml/badge.svg)](https://github.com/thedevmystic/mystic-github-actions/actions/workflows/cpp-coverage.yaml)
+[![Test SonarQube Action - Python](https://github.com/thedevmystic/mystic-github-actions/actions/workflows/python-coverage.yaml/badge.svg)](https://github.com/thedevmystic/mystic-github-actions/actions/workflows/python-coverage.yaml)
+
+This action generates test coverage reports for either a C++ or Python project and uploads them to SonarQube Cloud. Behavior
+branches based on the `language` input, so C++-only and Python-only arguments only apply when the matching language is selected.
+
+**Common Arguments**
+
+| Argument | Description |
+| -------- | ----------- |
+| `language` | The language of the project. Valid options: `cpp` or `python`. **Required.** |
+| `sonar-token` | SonarQube Cloud token. **Required** — pass this from a repository secret. |
+| `use-cache` | Whether to use cache or not. Defaults to `true`. |
+| `working-directory` | Current working directory (i.e., where `CMakeLists.txt` / `pyproject.toml` is located). Defaults to `.`. |
+| `additional-cmake-args` | Additional CMake arguments (C++ only). Defaults to `""`. |
+
+**C++-specific Arguments**
+
+| Argument | Description |
+| -------- | ----------- |
+| `cpp-coverage-tool` | Coverage tool used for C++. Valid options: `gcov` or `llvm-cov`. Defaults to `llvm-cov`. |
+| `cpp-coverage-tool-args` | Any additional arguments passed to gcov or llvm-cov. Defaults to `""`. |
+| `cpp-coverage-option` | CMake option that enables coverage building for your project. Defaults to `MYSTIC_ENABLE_COVERAGE`. |
+
+**Python-specific Arguments**
+
+| Argument | Description |
+| -------- | ----------- |
+| `python-coverage-tool-args` | Any additional arguments passed to the Python coverage tool. Defaults to `""`. |
+
+**Example (C++):**
+```yaml
+name: "SonarQube Coverage"
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  sonarqube:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: SonarQube Coverage
+        uses: mystic-framework/github-actions/sonarqube@v1
+        with:
+          language: cpp
+          sonar-token: ${{ secrets.SONAR_TOKEN }}
+          cpp-coverage-tool: llvm-cov
+          cpp-coverage-option: MYSTIC_ENABLE_COVERAGE
+```
+
+**Example (Python):**
+```yaml
+name: "SonarQube Coverage"
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  sonarqube:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: SonarQube Coverage
+        uses: mystic-framework/github-actions/sonarqube@v1
+        with:
+          language: python
+          sonar-token: ${{ secrets.SONAR_TOKEN }}
+```
 
 # Contributing
 
