@@ -82,7 +82,7 @@ The module provides following actions:
 
 ## Actions - Pre Commit
 
-[![Test Pre Commit Action](https://github.com/thedevmystic/mystic-github-actions/actions/workflows/test-pre-commit.yaml/badge.svg)](https://github.com/thedevmystic/mystic-github-actions/actions/workflows/test-pre-commit.yaml)
+[![Test Pre Commit Action](https://github.com/mystic-framework/github-actions/actions/workflows/test-pre-commit.yaml/badge.svg)](https://github.com/thedevmystic/github-actions/actions/workflows/test-pre-commit.yaml)
 
 This action configures python and pre-commit and runs it to ensure basic code hygiene.
 
@@ -117,7 +117,7 @@ jobs:
 
 ## Actions - C++ Compatibility
 
-[![Test C++ Compatibility Action](https://github.com/thedevmystic/mystic-github-actions/actions/workflows/test-cpp-compatibility.yaml/badge.svg)](https://github.com/thedevmystic/mystic-github-actions/actions/workflows/test-cpp-compatibility.yaml)
+[![Test C++ Compatibility Action](https://github.com/mystic-framework/github-actions/actions/workflows/test-cpp-compatibility.yaml/badge.svg)](https://github.com/thedevmystic/github-actions/actions/workflows/test-cpp-compatibility.yaml)
 
 This action builds a CMake-based C++ project (via Ninja) and optionally runs its test suite with CTest. It supports cross-compiler
 configuration and caching of build artifacts and ccache data for faster re-runs.
@@ -165,7 +165,7 @@ jobs:
 
 ## Actions - Python Compatibility
 
-[![Test Python Compatibility Action](https://github.com/thedevmystic/mystic-github-actions/actions/workflows/test-python-compatibility.yaml/badge.svg)](https://github.com/thedevmystic/mystic-github-actions/actions/workflows/test-python-compatibility.yaml)
+[![Test Python Compatibility Action](https://github.com/mystic-framework/github-actions/actions/workflows/test-python-compatibility.yaml/badge.svg)](https://github.com/thedevmystic/github-actions/actions/workflows/test-python-compatibility.yaml)
 
 This action sets up a Python environment, optionally lints/format-checks the project with Ruff, and runs its test suite with
 pytest. Dependency and virtual environment caching is supported out of the box.
@@ -210,8 +210,8 @@ jobs:
 
 ## Actions - SonarQube Coverage
 
-[![Test SonarQube Action - C++](https://github.com/thedevmystic/mystic-github-actions/actions/workflows/cpp-coverage.yaml/badge.svg)](https://github.com/thedevmystic/mystic-github-actions/actions/workflows/cpp-coverage.yaml)
-[![Test SonarQube Action - Python](https://github.com/thedevmystic/mystic-github-actions/actions/workflows/python-coverage.yaml/badge.svg)](https://github.com/thedevmystic/mystic-github-actions/actions/workflows/python-coverage.yaml)
+[![Test SonarQube Action - C++](https://github.com/mystic-framework/github-actions/actions/workflows/cpp-coverage.yaml/badge.svg)](https://github.com/thedevmystic/github-actions/actions/workflows/cpp-coverage.yaml)
+[![Test SonarQube Action - Python](https://github.com/mystic-framework/github-actions/actions/workflows/python-coverage.yaml/badge.svg)](https://github.com/thedevmystic/github-actions/actions/workflows/python-coverage.yaml)
 
 This action generates test coverage reports for either a C++ or Python project and uploads them to SonarQube Cloud. Behavior
 branches based on the `language` input, so C++-only and Python-only arguments only apply when the matching language is selected.
