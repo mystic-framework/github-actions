@@ -82,7 +82,7 @@ runs:
           ${{ env.LOCALAPPDATA }}/ccache
           ${{ env.XDG_CACHE_HOME }}/ccache
         key: cache-${{ runner.os }}-${{ inputs.compiler }}-${{ inputs.build-type }}-${{ hashFiles(format('{0}/CMakeLists.txt', inputs.working-directory)) }}
-        restore-keys: cache-${{ runner.os }}-${{ inputs.build-type }}-
+        restore-keys: cache-${{ runner.os }}-${{ inputs.compiler }}-
 
     - name: Setup C++ Environment
       uses: aminya/setup-cpp@v1
