@@ -42,11 +42,6 @@ inputs:
     type: string
     required: false
     default: "." # Defaults to find at root
-  additional-cmake-args:
-    description: "Additional CMake Arguments."
-    type: string
-    required: false
-    default: ""
 
   cpp-coverage-tool:
     description: "Coverage tool use for C++. Valid options: gcov or llvm-cov"
@@ -63,7 +58,17 @@ inputs:
     type: string
     required: false
     default: "MYSTIC_ENABLE_COVERAGE"
+  cpp-additional-cmake-args:
+    description: "Additional CMake Arguments."
+    type: string
+    required: false
+    default: ""
 
+  python-version:
+    description: "Python version to use."
+    type: string
+    required: false
+    default: "3.x"
   python-coverage-tool-args:
     description: "Any additional arguments passed to python coverage tool."
     type: string
@@ -113,7 +118,7 @@ runs:
       if: inputs.language == 'python'
       uses: actions/setup-python@v7
       with:
-        python-version: '3.x'
+        python-version: ${{ inputs.python-version }}
 
     - name: Install SonarQube Build Wrapper
       if: inputs.language == 'cpp'
