@@ -224,7 +224,6 @@ branches based on the `language` input, so C++-only and Python-only arguments on
 | `sonar-token` | SonarQube Cloud token. **Required** — pass this from a repository secret. |
 | `use-cache` | Whether to use cache or not. Defaults to `true`. |
 | `working-directory` | Current working directory (i.e., where `CMakeLists.txt` / `pyproject.toml` is located). Defaults to `.`. |
-| `additional-cmake-args` | Additional CMake arguments (C++ only). Defaults to `""`. |
 
 **C++-specific Arguments**
 
@@ -233,6 +232,7 @@ branches based on the `language` input, so C++-only and Python-only arguments on
 | `cpp-coverage-tool` | Coverage tool used for C++. Valid options: `gcov` or `llvm-cov`. Defaults to `llvm-cov`. |
 | `cpp-coverage-tool-args` | Any additional arguments passed to gcov or llvm-cov. Defaults to `""`. |
 | `cpp-coverage-option` | CMake option that enables coverage building for your project. Defaults to `MYSTIC_ENABLE_COVERAGE`. |
+| `additional-cmake-args` | Additional CMake arguments. Defaults to `""`. |
 
 **Python-specific Arguments**
 
