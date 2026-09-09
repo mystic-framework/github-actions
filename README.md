@@ -232,12 +232,13 @@ branches based on the `language` input, so C++-only and Python-only arguments on
 | `cpp-coverage-tool` | Coverage tool used for C++. Valid options: `gcov` or `llvm-cov`. Defaults to `llvm-cov`. |
 | `cpp-coverage-tool-args` | Any additional arguments passed to gcov or llvm-cov. Defaults to `""`. |
 | `cpp-coverage-option` | CMake option that enables coverage building for your project. Defaults to `MYSTIC_ENABLE_COVERAGE`. |
-| `additional-cmake-args` | Additional CMake arguments. Defaults to `""`. |
+| `cpp-additional-cmake-args` | Additional CMake arguments. Defaults to `""`. |
 
 **Python-specific Arguments**
 
 | Argument | Description |
 | -------- | ----------- |
+| `python-version` | The Python version to use for the coverage. Defaults to `3.x`. |
 | `python-coverage-tool-args` | Any additional arguments passed to the Python coverage tool. Defaults to `""`. |
 
 **Example (C++):**
