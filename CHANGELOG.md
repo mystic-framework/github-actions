@@ -2,6 +2,12 @@
 
 All the notable changes in the project `mystic-framework/github-actions` will be documented here.
 
+## [1.2.0] - 2026-10-09
+
+### Fixed
+
+- Missing headers in LLVM coverage reports.
+
 ## [1.1.0] - 2026-09-09
 
 ### Added
