@@ -216,11 +216,24 @@ runs:
       shell: bash
       run: |
         llvm-profdata merge -sparse build/*.profraw -o coverage.profdata
-        llvm-cov show \
+
+        TEST_BIN="$(find build -maxdepth 1 -type f -executable -name '*test*' | head -n1)"
+        if [ -z "$TEST_BIN" ]; then
+          echo "::error::No test executable found in build/"
+          exit 1
+        fi
+
+        # Shared libraries hold code the test binary doesn't contain, so llvm-cov needs them too
+        OBJECTS=""
+        for lib in $(find build -maxdepth 1 -name '*.so'); do
+          OBJECTS="$OBJECTS -object $lib"
+        done
+
+        llvm-cov show "$TEST_BIN" $OBJECTS \
           --instr-profile=coverage.profdata \
           --show-branches=count \
           --ignore-filename-regex='(build/|third_party/|vendor/)' \
-          $(find build -maxdepth 1 -type f -executable -name "*test*") \
+          ${{ inputs.cpp-coverage-tool-args }} \
           > coverage.report
 
     - name: SonarQube Scan (GCC)
