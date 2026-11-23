@@ -68,22 +68,6 @@ runs:
       shell: bash
       run: ${{ inputs.install-command }}
 
-    - name: Setup Cache
-      id: cache
-      if: ${{ inputs.use-cache == 'true' }}
-      uses: actions/cache@v6
-      with:
-        path: |
-          ${{ inputs.working-directory }}/build/
-          ~/.cache/ccache
-          ~/.ccache
-          ~/.config/ccache
-          ~/Library/Caches/ccache
-          ${{ env.LOCALAPPDATA }}/ccache
-          ${{ env.XDG_CACHE_HOME }}/ccache
-        key: cache-${{ runner.os }}-${{ inputs.compiler }}-${{ inputs.build-type }}-${{ hashFiles(format('{0}/CMakeLists.txt', inputs.working-directory)) }}
-        restore-keys: cache-${{ runner.os }}-${{ inputs.compiler }}-
-
     - name: Setup C++ Environment
       uses: aminya/setup-cpp@v1
       with:
@@ -92,20 +76,35 @@ runs:
         ninja: true
         ccache: ${{ inputs.use-cache }}
 
+    - name: Setup Cache
+      id: cache
+      if: ${{ inputs.use-cache == 'true' }}
+      uses: actions/cache@v6
+      with:
+        path: |
+          ~/.cache/ccache
+          ~/.ccache
+          ~/.config/ccache
+          ~/Library/Caches/ccache
+          ${{ env.LOCALAPPDATA }}/ccache
+          ${{ env.XDG_CACHE_HOME }}/ccache
+        key: cache-${{ runner.os }}-${{ inputs.compiler }}-${{ inputs.build-type }}-${{ hashFiles(format('{0}/CMakeLists.txt', inputs.working-directory), format('{0}/**/*.cpp', inputs.working-directory), format('{0}/**/*.cppm', inputs.working-directory), format('{0}/**/*.hpp', inputs.working-directory), format('{0}/**/*.h', inputs.working-directory)) }}
+        restore-keys: |
+          cache-${{ runner.os }}-${{ inputs.compiler }}-${{ inputs.build-type }}-
+          cache-${{ runner.os }}-${{ inputs.compiler }}-
 
     - name: Configure CMake
       working-directory: ${{ inputs.working-directory }}
       shell: bash
       run: |
-        CACHE="${{ inputs.use-cache }}"
-        if [ "$CACHE" = "true" ]; then
-          CCACHE="-DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache"
+        if [ "${{ inputs.use-cache }}" = "true" ]; then
+          CCACHE_ARGS="-DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache"
         else
-          CCACHE=""
+          CCACHE_ARGS=""
         fi
 
         cmake -S . -B build -G "Ninja" \
-          $CCACHE \
+          $CCACHE_ARGS \
           -DCMAKE_BUILD_TYPE=${{ inputs.build-type }} \
           ${{ inputs.additional-cmake-args }}
 
