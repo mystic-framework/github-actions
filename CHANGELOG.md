@@ -2,6 +2,12 @@
 
 All the notable changes in the project `mystic-framework/github-actions` will be documented here.
 
+## [1.2.1] - 2026-11-23
+
+### Fixed
+
+- Stale cache issue in C++ Compatibility action.
+
 ## [1.2.0] - 2026-10-09
 
 ### Fixed
